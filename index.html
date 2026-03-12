@@ -3,8 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPulse - Premium Student Management</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EduPulse - Smart Learning Management</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="apple-touch-icon"
+        href="https://api.dicebear.com/7.x/notionists/svg?seed=EduPulse&backgroundColor=3b82f6">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -139,12 +144,108 @@
             box-shadow: 0 10px 40px -10px rgba(217, 119, 6, 0.5);
         }
 
+        /* --- Responsive Structural Overhaul --- */
+        :root {
+            --sidebar-width: 280px;
+        }
+
+        .app-shell {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+            background: #F8FAFC;
+        }
+
+        .sidebar-container {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-right: 1px solid #E2E8F0;
+            z-index: 50;
+            display: none;
+            /* Hidden on Mobile */
+        }
+
+        .main-content {
+            flex: 1;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            background: #fdfdff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content Limiter for Professional Desktop look */
+        .content-limiter {
+            width: 100%;
+            max-width: 64rem;
+            /* max-w-4xl */
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar-container {
+                display: block;
+                /* Show on Desktop */
+            }
+
+            .main-content {
+                padding-bottom: 0px;
+            }
+
+            .mobile-nav {
+                display: none !important;
+            }
+        }
+
+        /* Fluid Adjustments */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         .app-container {
-            box-shadow:
-                0 0 0 12px #1E293B,
-                0 0 0 14px #334155,
-                0 25px 50px -12px rgba(0, 0, 0, 0.7),
-                0 0 100px 20px rgba(99, 102, 241, 0.15);
+            /* Removed fixed mobile constraints */
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        .mesh-bg {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            /* Adjusted for a lighter, cleaner desktop feel */
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(139, 92, 246, 0.05) 0, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(244, 63, 94, 0.05) 0, transparent 50%);
+        }
+
+        /* Bottom Nav Mobile styles */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: clamp(80px, 12vh, 100px);
+            z-index: 100;
         }
     </style>
 </head>
@@ -237,7 +338,14 @@
                 gradeSuccess: "Grade published!",
                 noGrades: "No grades available yet.",
                 selectStudent: "Select Student",
-                studentEmail: "Student Email"
+                studentEmail: "Student Email",
+
+                // Profile Specific
+                profileTitle: "Profile",
+                logout: "Sign Out",
+                installApp: "Install EduPulse App",
+                installing: "Installing...",
+                installed: "App Installed!"
             },
             zh: {
                 // ... (keeping Chinese identical to current structure, just adding translation keys)
@@ -321,7 +429,14 @@
                 gradeSuccess: "成绩已发布！",
                 noGrades: "暂无成绩记录。",
                 selectStudent: "选择学生",
-                studentEmail: "学生邮箱"
+                studentEmail: "学生邮箱",
+
+                // Profile Specific
+                profileTitle: "个人资料",
+                logout: "推出登录",
+                installApp: "安装应用",
+                installing: "安装中...",
+                installed: "应用已安装！"
             }
         };
 
@@ -1090,33 +1205,106 @@
             );
         };
 
-        const BottomNav = ({ t }) => {
-            const navItems = [
-                { id: 'home', label: t.home, icon: 'home', active: true },
-                { id: 'messages', label: t.messages, icon: 'message-square', active: false },
-                { id: 'notes', label: t.notes, icon: 'file-text', active: false },
-                { id: 'me', label: t.me, icon: 'user', active: false },
-            ];
-
+        const ProfileScreen = ({ t, role, onLogout, installPrompt }) => {
             return (
-                <div className="absolute bottom-0 left-0 right-0 h-[100px] glass-panel rounded-t-[2.5rem] flex justify-around items-center px-6 pb-6 pt-4 z-40 border-b-0 border-r-0 border-l-0">
-                    {navItems.map(item => (
-                        <div key={item.id} className="flex flex-col items-center justify-center gap-1 cursor-pointer w-16 group">
-                            <div className={`relative flex items-center justify-center w-14 h-12 rounded-[18px] transition-all duration-300 ${item.active ? 'text-white shadow-lg glowing-shadow-indigo pointer-events-none' : 'text-slate-400 group-hover:text-slate-700 group-hover:bg-slate-100/50'}`}>
-                                {item.active && <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-indigo-500 rounded-[18px]"></div>}
-                                <div className="relative z-10 flex flex-col items-center gap-1">
-                                    <Icon
-                                        name={item.icon}
-                                        size={item.active ? 22 : 24}
-                                        className={item.active ? '' : 'transition-transform group-hover:scale-110 group-active:scale-95'}
-                                    />
+                <div className="flex-1 flex flex-col px-7 pt-2 pb-28 relative z-10 w-full overflow-y-auto no-scrollbar h-full">
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-black font-display text-slate-800">{t.profileTitle}</h2>
+                    </div>
+
+                    <div className="glass-card rounded-[2.5rem] p-8 mb-8 flex flex-col items-center shadow-xl animate-fade-in-up">
+                        <div className="w-24 h-24 rounded-3xl bg-slate-100 p-1 mb-4 shadow-inner relative">
+                            <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${role.name}&backgroundColor=f1f5f9`} className="w-full h-full object-cover rounded-2xl" />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-800 mb-1">{role.name}</h3>
+                        <p className="text-slate-500 font-bold uppercase tracking-widest text-[12px] mb-6">{role.role}</p>
+
+                        <div className="w-full space-y-3">
+                            {installPrompt && (
+                                <button
+                                    onClick={() => installPrompt.prompt()}
+                                    className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg glowing-shadow-indigo active:scale-95 transition-all flex items-center justify-center gap-3"
+                                >
+                                    <Icon name="download" size={20} />
+                                    {t.installApp}
+                                </button>
+                            )}
+
+                            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                    <Icon name="mail" size={20} />
+                                </div>
+                                <div>
+                                    <span className="block text-[10px] uppercase tracking-tighter font-bold text-slate-400">Email Address</span>
+                                    <span className="font-bold text-slate-700">{role.email}</span>
                                 </div>
                             </div>
-                            <span className={`text-[11px] font-bold tracking-wide transition-all duration-300 ${item.active ? 'text-indigo-600 opacity-100' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>
-                                {item.label}
-                            </span>
                         </div>
-                    ))}
+                    </div>
+
+                    <button
+                        onClick={onLogout}
+                        className="w-full bg-rose-50 border border-rose-100 text-rose-600 font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-rose-100 transition-colors animate-fade-in-up"
+                    >
+                        <Icon name="log-out" size={20} />
+                        {t.logout}
+                    </button>
+
+                    <div className="mt-10 pt-10 border-t border-slate-100 text-center opacity-30 animate-fade-in-up">
+                        <p className="text-[12px] font-black uppercase tracking-[0.2em]">{t.appTitle} v2.0</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const BottomNav = ({ t, currentView, onNavigate, isSidebar = false }) => {
+            const navItems = [
+                { id: 'home', label: t.home, icon: 'home' },
+                { id: 'messages', label: t.messages, icon: 'message-square' },
+                { id: 'notes', label: t.notes, icon: 'file-text' },
+                { id: 'me', label: t.me, icon: 'user' },
+            ];
+
+            const containerClasses = isSidebar
+                ? "flex flex-col gap-4 p-6"
+                : "absolute bottom-0 left-0 right-0 h-[100px] glass-panel rounded-t-[2.5rem] flex justify-around items-center px-6 pb-6 pt-4 z-40 mobile-nav";
+
+            const itemClasses = isSidebar
+                ? "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all cursor-pointer group"
+                : "flex flex-col items-center justify-center gap-1 cursor-pointer w-16 group";
+
+            return (
+                <div className={containerClasses}>
+                    {isSidebar && (
+                        <div className="mb-10 px-4">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg glowing-shadow-indigo">
+                                    <Icon name="graduation-cap" size={24} />
+                                </div>
+                                <h1 className="text-2xl font-black tracking-tighter text-slate-900">{t.appTitle}</h1>
+                            </div>
+                        </div>
+                    )}
+                    {navItems.map(item => {
+                        const isActive = currentView === item.id;
+                        return (
+                            <div key={item.id} onClick={() => onNavigate(item.id)} className={`${itemClasses} ${isSidebar && isActive ? 'bg-indigo-600 text-white shadow-lg glowing-shadow-indigo' : ''}`}>
+                                <div className={`relative flex items-center justify-center ${isSidebar ? '' : 'w-14 h-12 rounded-[18px] transition-all duration-300'} ${!isSidebar && isActive ? 'text-white shadow-lg glowing-shadow-indigo pointer-events-none' : 'text-slate-400 group-hover:text-slate-700'}`}>
+                                    {(isActive && !isSidebar) && <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-indigo-500 rounded-[18px]"></div>}
+                                    <div className="relative z-10 flex flex-col items-center gap-1">
+                                        <Icon
+                                            name={item.icon}
+                                            size={isActive ? 22 : 24}
+                                            className={isActive || isSidebar ? '' : 'transition-transform group-hover:scale-110 group-active:scale-95'}
+                                        />
+                                    </div>
+                                </div>
+                                <span className={`${isSidebar ? 'font-black text-[15px]' : 'text-[11px] font-bold tracking-wide transition-all duration-300'} ${isActive ? (isSidebar ? 'text-white' : 'text-indigo-600 opacity-100') : (isSidebar ? 'text-slate-500 group-hover:text-slate-900' : 'text-slate-400 opacity-0 group-hover:opacity-100')}`}>
+                                    {item.label}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
             );
         };
@@ -1126,6 +1314,7 @@
             const [lang, setLang] = React.useState('en');
             const [userRole, setUserRole] = React.useState(null); // Will store {email, name, role}
             const [currentView, setCurrentView] = React.useState('home');
+            const [installPrompt, setInstallPrompt] = React.useState(null);
 
             // Check for persistent session
             React.useEffect(() => {
@@ -1135,6 +1324,21 @@
                         const user = JSON.parse(session);
                         setUserRole(user);
                     } catch (e) { }
+                }
+
+                // PWA Install Prompt
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    setInstallPrompt(e);
+                });
+
+                // Register Service Worker
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('./sw.js').then(reg => {
+                            console.log('SW Registered', reg);
+                        });
+                    });
                 }
             }, []);
 
@@ -1155,74 +1359,73 @@
             };
 
             return (
-                <div className="min-h-screen w-full flex items-center justify-center p-4 lg:p-8 font-sans">
-                    {/* Floating Orbs behind the phone */}
-                    <div className="fixed top-20 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
-                    <div className="fixed bottom-20 right-1/4 w-96 h-96 bg-rose-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+                <div className="app-shell">
+                    {/* Sidebar for Desktop */}
+                    {userRole && (
+                        <div className="sidebar-container">
+                            <BottomNav t={t} currentView={currentView} onNavigate={setCurrentView} isSidebar={true} />
+                        </div>
+                    )}
 
-                    {/* Device Container Wrapper with iPhone Frame styling */}
-                    <div className="w-full max-w-[428px] h-[926px] max-h-[90vh] app-container bg-black rounded-[55px] p-2 relative z-10">
-                        {/* Actual Screen Content */}
-                        <div className="w-full h-full mesh-bg rounded-[45px] overflow-hidden flex flex-col relative z-20">
+                    <div className="main-content">
+                        {/* Fluid App Container */}
+                        <div className="w-full h-full mesh-bg flex flex-col relative z-20">
 
-                            {/* Dynamic Island Mock */}
-                            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full z-50 flex items-center justify-between px-3">
+                            {/* Optional: Floating Island Hidden on Large screen or kept for style */}
+                            <div className="hidden md:flex absolute top-3 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full z-50 flex items-center justify-between px-3 opacity-20 hover:opacity-100 transition-opacity">
                                 <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
                                 <div className="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
                             </div>
 
-                            {/* iOS Status Bar */}
-                            <div className="h-12 w-full flex justify-between items-center px-8 pt-2 select-none bg-transparent absolute top-0 z-40">
-                                <span className="text-[14px] font-bold text-slate-900 tracking-tight">9:41</span>
-                                <div className="flex gap-1.5 items-center">
-                                    <Icon name="bar-chart-2" size={14} className="text-slate-900 rotate-90" />
-                                    <Icon name="wifi" size={14} className="text-slate-900" />
-                                    <Icon name="battery-full" size={18} className="text-slate-900" />
+                            {/* Top App Bar with Limiter */}
+                            <div className="content-limiter">
+                                <div className="px-6 pt-10 md:pt-16 pb-2 flex justify-between items-center z-30 relative animate-fade-in-up">
+                                    {userRole ? (
+                                        <button
+                                            onClick={currentView === 'home' ? handleLogout : handleBack}
+                                            className="h-11 w-11 glass-card rounded-full flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                                        >
+                                            <Icon name="arrow-left" size={20} />
+                                        </button>
+                                    ) : (
+                                        <div className="w-11"></div>
+                                    )}
+
+                                    <button
+                                        onClick={toggleLang}
+                                        className="glass-card text-indigo-700 px-5 py-2.5 rounded-full text-sm font-bold shadow-sm shadow-indigo-100 flex items-center gap-2 hover:bg-white hover:scale-105 active:scale-95 transition-all"
+                                    >
+                                        <Icon name="globe" size={16} className="text-indigo-500" />
+                                        <span className="font-display tracking-wide">{t.switchLang}</span>
+                                    </button>
+                                </div>
+
+                                {/* Content Routing with Limiter */}
+                                <div className="flex-1 w-full overflow-hidden">
+                                    {!userRole ? (
+                                        <AuthScreen t={t} onLogin={(user) => { setUserRole(user); setCurrentView('home'); }} />
+                                    ) : (
+                                        currentView === 'attendance' ? (
+                                            <AttendanceScreen t={t} role={userRole} />
+                                        ) : currentView === 'homework' ? (
+                                            <HomeworkScreen t={t} role={userRole} />
+                                        ) : currentView === 'grades' ? (
+                                            <GradesScreen t={t} role={userRole} />
+                                        ) : currentView === 'me' ? (
+                                            <ProfileScreen t={t} role={userRole} onLogout={handleLogout} installPrompt={installPrompt} />
+                                        ) : (
+                                            <HomeScreen t={t} role={userRole.role} lang={lang} onNavigate={setCurrentView} />
+                                        )
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Top App Bar */}
-                            <div className="px-6 pt-16 pb-2 flex justify-between items-center z-30 relative animate-fade-in-up">
-                                {userRole ? (
-                                    <button
-                                        onClick={currentView === 'home' ? handleLogout : handleBack}
-                                        className="h-11 w-11 glass-card rounded-full flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:scale-105 active:scale-95 transition-all shadow-sm"
-                                    >
-                                        <Icon name="arrow-left" size={20} />
-                                    </button>
-                                ) : (
-                                    <div className="w-11"></div>
-                                )}
-
-                                <button
-                                    onClick={toggleLang}
-                                    className="glass-card text-indigo-700 px-5 py-2.5 rounded-full text-sm font-bold shadow-sm shadow-indigo-100 flex items-center gap-2 hover:bg-white hover:scale-105 active:scale-95 transition-all"
-                                >
-                                    <Icon name="globe" size={16} className="text-indigo-500" />
-                                    <span className="font-display tracking-wide">{t.switchLang}</span>
-                                </button>
-                            </div>
-
-                            {/* Content Routing */}
-                            {!userRole ? (
-                                <AuthScreen t={t} onLogin={(user) => { setUserRole(user); setCurrentView('home'); }} />
-                            ) : (
-                                currentView === 'attendance' ? (
-                                    <AttendanceScreen t={t} role={userRole} />
-                                ) : currentView === 'homework' ? (
-                                    <HomeworkScreen t={t} role={userRole} />
-                                ) : currentView === 'grades' ? (
-                                    <GradesScreen t={t} role={userRole} />
-                                ) : (
-                                    <HomeScreen t={t} role={userRole.role} lang={lang} onNavigate={setCurrentView} />
-                                )
+                            {/* Mobile Navigation */}
+                            {userRole && (
+                                <div className="md:hidden lg:hidden">
+                                    <BottomNav t={t} currentView={currentView} onNavigate={setCurrentView} />
+                                </div>
                             )}
-
-                            {/* Navigation */}
-                            {userRole && <BottomNav t={t} />}
-
-                            {/* iOS Home Indicator */}
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-900/50 rounded-full z-50"></div>
                         </div>
                     </div>
                 </div>
