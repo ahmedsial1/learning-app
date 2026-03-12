@@ -1,0 +1,15 @@
+{
+    "name": "edupulse-smart-learning",
+    "version": "1.0.1",
+    "description": "Premium Student Management & Academic Command Center",
+    "main": "index.html",
+    "scripts": {
+        "start": "echo \"Direct HTML file, no build needed.\""
+    },
+    "keywords": [
+        "pwa",
+        "education"
+    ],
+    "author": "Antigravity",
+    "license": "MIT"
+}

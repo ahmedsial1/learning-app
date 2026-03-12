@@ -236,6 +236,7 @@
             border-radius: 0;
             box-shadow: none;
             padding: 0;
+            touch-action: pan-y;
         }
 
         .mesh-bg {
@@ -543,7 +544,7 @@
             };
 
             return (
-                <div className="flex-1 flex flex-col lg:flex-row w-full h-full overflow-hidden bg-slate-50">
+                <div className="flex-1 flex flex-col lg:flex-row w-full min-h-screen overflow-y-auto no-scrollbar bg-slate-50 touch-action-pan-y">
                     {/* Left Panel: Visual/Branding (Desktop Only) */}
                     <div className="hidden lg:flex lg:w-[45%] relative bg-slate-900 items-center justify-center overflow-hidden">
                         {/* Premium Abstract Background */}
