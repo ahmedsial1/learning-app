@@ -164,7 +164,7 @@
         .app-shell {
             display: flex;
             width: 100%;
-            min-height: 100vh;
+            height: 100vh;
             background: #F8FAFC;
         }
 
@@ -187,9 +187,10 @@
             margin: 0 auto;
             position: relative;
             background: #fdfdff;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         /* Content Limiter for Professional Desktop look */
@@ -1637,7 +1638,7 @@
                                 </div>
 
                                 {/* Content Routing with Limiter */}
-                                <div className="flex-1 w-full overflow-hidden">
+                                <div className="flex-1 w-full overflow-y-auto no-scrollbar">
                                     {!userRole ? (
                                         <AuthScreen t={t} onLogin={(user) => { setUserRole(user); setCurrentView('home'); }} />
                                     ) : (
