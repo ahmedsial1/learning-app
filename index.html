@@ -225,7 +225,19 @@
                 submitHw: "Submit Assignment",
                 noHw: "No assignments yet!",
                 hwSuccess: "Homework submitted!",
-                hwPlaceholder: "e.g. Solve exercises 1-10"
+                hwPlaceholder: "e.g. Solve exercises 1-10",
+
+                // Grades Specific
+                gradesTitle: "Academic Performance",
+                gpa: "Total GPA",
+                subject: "Subject",
+                grade: "Score",
+                inputGrade: "Assign Score",
+                saveGrade: "Publish Grade",
+                gradeSuccess: "Grade published!",
+                noGrades: "No grades available yet.",
+                selectStudent: "Select Student",
+                studentEmail: "Student Email"
             },
             zh: {
                 // ... (keeping Chinese identical to current structure, just adding translation keys)
@@ -297,7 +309,19 @@
                 submitHw: "提交作业",
                 noHw: "暂无作业！",
                 hwSuccess: "作业提交成功！",
-                hwPlaceholder: "例如：完成课后练习 1-10"
+                hwPlaceholder: "例如：完成课后练习 1-10",
+
+                // Grades Specific
+                gradesTitle: "学业成绩",
+                gpa: "当前绩点",
+                subject: "科目",
+                grade: "分数",
+                inputGrade: "输入分数",
+                saveGrade: "发布成绩",
+                gradeSuccess: "成绩已发布！",
+                noGrades: "暂无成绩记录。",
+                selectStudent: "选择学生",
+                studentEmail: "学生邮箱"
             }
         };
 
@@ -489,7 +513,7 @@
             const gridItems = [
                 { id: 'attendance', label: t.attendance, icon: 'check-circle', color: 'from-amber-400 to-orange-500', shadow: 'glowing-shadow-amber', action: () => onNavigate('attendance') },
                 { id: 'homework', label: t.homework, icon: 'book-open', color: 'from-indigo-500 to-purple-500', shadow: 'glowing-shadow-indigo', action: () => onNavigate('homework') },
-                { id: 'grades', label: t.grades, icon: 'pie-chart', color: 'from-rose-400 to-pink-500', shadow: 'glowing-shadow-rose' },
+                { id: 'grades', label: t.grades, icon: 'pie-chart', color: 'from-rose-400 to-pink-500', shadow: 'glowing-shadow-rose', action: () => onNavigate('grades') },
                 { id: 'schedule', label: t.schedule, icon: 'calendar', color: 'from-teal-400 to-emerald-500', shadow: 'glowing-shadow-teal' },
             ];
 
@@ -926,6 +950,146 @@
             );
         };
 
+        const GradesScreen = ({ t, role }) => {
+            const isStudent = role.role === 'student';
+            const [gradesData, setGradesData] = React.useState([]);
+            const [studentEmail, setStudentEmail] = React.useState('');
+            const [subject, setSubject] = React.useState('');
+            const [score, setScore] = React.useState('');
+            const [success, setSuccess] = React.useState(false);
+
+            // Fetch Grades
+            React.useEffect(() => {
+                const allGrades = JSON.parse(localStorage.getItem('eduPulse_grades') || '{}');
+                if (isStudent) {
+                    setGradesData(allGrades[role.email] || []);
+                } else {
+                    // Teacher view: maybe show overall recent grades or just wait for input
+                    setGradesData([]);
+                }
+            }, [role.email, isStudent]);
+
+            const calculateGPA = (grades) => {
+                if (!grades || grades.length === 0) return "0.00";
+                const total = grades.reduce((acc, curr) => acc + parseFloat(curr.score), 0);
+                return (total / (grades.length * 25)).toFixed(2); // Mock scale: 100 = 4.0
+            };
+
+            const handleAssignGrade = (e) => {
+                e.preventDefault();
+                if (!studentEmail || !subject || !score) return;
+
+                const allGrades = JSON.parse(localStorage.getItem('eduPulse_grades') || '{}');
+                const studentGrades = allGrades[studentEmail] || [];
+
+                const newGrade = {
+                    id: Date.now(),
+                    subject,
+                    score: parseFloat(score),
+                    date: new Date().toLocaleDateString(),
+                    teacher: role.name
+                };
+
+                allGrades[studentEmail] = [newGrade, ...studentGrades];
+                localStorage.setItem('eduPulse_grades', JSON.stringify(allGrades));
+
+                setStudentEmail(''); setSubject(''); setScore('');
+                setSuccess(true);
+                setTimeout(() => setSuccess(false), 3000);
+            };
+
+            return (
+                <div className="flex-1 flex flex-col px-7 pt-2 pb-28 relative z-10 w-full overflow-y-auto no-scrollbar h-full">
+                    <div className="mb-8 flex justify-between items-center animate-fade-in-up">
+                        <h2 className="text-3xl font-black font-display text-slate-800">{t.gradesTitle}</h2>
+                        {success && (
+                            <div className="bg-emerald-500 text-white text-[12px] font-bold px-4 py-2 rounded-full animate-bounce shadow-lg">
+                                {t.gradeSuccess}
+                            </div>
+                        )}
+                    </div>
+
+                    {isStudent ? (
+                        /* Student View: GPA and Grades List */
+                        <>
+                            <div className="glass-card rounded-[2.5rem] p-8 mb-8 relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-xl glowing-shadow-indigo border-none animate-fade-in-up">
+                                <div className="relative z-10">
+                                    <span className="text-white/70 text-sm font-bold uppercase tracking-widest">{t.gpa}</span>
+                                    <h3 className="text-6xl font-black font-display mt-2">{calculateGPA(gradesData)}</h3>
+                                    <div className="mt-6 flex items-center gap-2 bg-white/10 w-fit px-4 py-2 rounded-xl backdrop-blur-md">
+                                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                                        <span className="text-[12px] font-bold text-white/90 uppercase tracking-wider">Top 5% of Class</span>
+                                    </div>
+                                </div>
+                                <Icon name="trending-up" size={140} className="absolute -right-10 -bottom-10 text-white/10 rotate-12" />
+                            </div>
+
+                            <div className="space-y-4">
+                                {gradesData.length === 0 ? (
+                                    <div className="text-center py-20 opacity-40">
+                                        <Icon name="award" size={48} className="mx-auto mb-4" />
+                                        <p className="font-bold">{t.noGrades}</p>
+                                    </div>
+                                ) : (
+                                    gradesData.map((g, idx) => (
+                                        <div key={g.id} className="glass-card rounded-2xl p-5 flex justify-between items-center animate-fade-in-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                                                    <Icon name="book" size={24} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-800">{g.subject}</h4>
+                                                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">{g.date}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className={`text-2xl font-black font-display ${g.score >= 90 ? 'text-emerald-500' : g.score >= 75 ? 'text-indigo-500' : 'text-slate-600'}`}>
+                                                    {g.score}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        /* Teacher View: Input Grades */
+                        <form onSubmit={handleAssignGrade} className="glass-card rounded-[2.5rem] p-6 mb-8 shadow-xl animate-fade-in-up border-rose-100/50">
+                            <div className="mb-4">
+                                <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.studentEmail}</label>
+                                <input
+                                    type="email" value={studentEmail} onChange={e => setStudentEmail(e.target.value)}
+                                    placeholder="student@example.com"
+                                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all font-medium"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div>
+                                    <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.subject}</label>
+                                    <input
+                                        type="text" value={subject} onChange={e => setSubject(e.target.value)}
+                                        placeholder="Mathematics"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all font-medium"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.grade}</label>
+                                    <input
+                                        type="number" value={score} onChange={e => setScore(e.target.value)}
+                                        placeholder="0-100" min="0" max="100"
+                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-rose-500/10 transition-all font-medium text-center font-black"
+                                    />
+                                </div>
+                            </div>
+                            <button type="submit" className="w-full bg-rose-500 text-white font-display font-bold py-4 rounded-2xl shadow-lg glowing-shadow-rose active:scale-95 transition-all">
+                                {t.saveGrade}
+                            </button>
+                        </form>
+                    )}
+                </div>
+            );
+        };
+
         const BottomNav = ({ t }) => {
             const navItems = [
                 { id: 'home', label: t.home, icon: 'home', active: true },
@@ -1047,6 +1211,8 @@
                                     <AttendanceScreen t={t} role={userRole} />
                                 ) : currentView === 'homework' ? (
                                     <HomeworkScreen t={t} role={userRole} />
+                                ) : currentView === 'grades' ? (
+                                    <GradesScreen t={t} role={userRole} />
                                 ) : (
                                     <HomeScreen t={t} role={userRole.role} lang={lang} onNavigate={setCurrentView} />
                                 )
