@@ -41,6 +41,7 @@
                         'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
                     },
                     keyframes: {
                         blob: {
@@ -126,6 +127,17 @@
                 radial-gradient(at 0% 100%, hsla(22, 100%, 77%, 0.08) 0px, transparent 50%),
                 radial-gradient(at 80% 100%, hsla(242, 100%, 70%, 0.2) 0px, transparent 50%),
                 radial-gradient(at 0% 0%, hsla(343, 100%, 76%, 0.05) 0px, transparent 50%);
+        }
+
+        .mesh-bg-dark {
+            background-color: #0F172A;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(263, 80%, 50%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(280, 80%, 50%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, hsla(240, 80%, 50%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(220, 80%, 50%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, hsla(263, 80%, 50%, 0.1) 0px, transparent 50%);
         }
 
         .glowing-shadow-indigo {
@@ -530,126 +542,176 @@
             };
 
             return (
-                <div className="flex-1 flex flex-col p-8 relative z-10 w-full overflow-y-auto no-scrollbar pb-24 h-full">
-                    {/* Abstract Backgrounds */}
-                    <div className="absolute top-[-10%] right-[-10%] w-[120%] h-[50%] bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob pointer-events-none"></div>
-                    <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-[50%] bg-gradient-to-tr from-cyan-300 via-teal-300 to-emerald-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob-reverse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+                <div className="flex-1 flex flex-col lg:flex-row w-full h-full overflow-hidden bg-slate-50">
+                    {/* Left Panel: Visual/Branding (Desktop Only) */}
+                    <div className="hidden lg:flex lg:w-[45%] relative bg-slate-900 items-center justify-center overflow-hidden">
+                        {/* Premium Abstract Background */}
+                        <div className="absolute inset-0 mesh-bg-dark opacity-100"></div>
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 blur-[120px] rounded-full"></div>
+                        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-600/10 blur-[120px] rounded-full"></div>
 
-                    <div className="flex-1 flex flex-col pt-10 relative z-20 w-full animate-fade-in-up">
-                        {/* Header */}
-                        <div className="mb-10 text-center">
-                            <div className="w-20 h-20 bg-white/40 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/60">
-                                <div className="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-purple-500 rounded-[12px] flex items-center justify-center glowing-shadow-indigo">
-                                    <Icon name="graduation-cap" size={32} className="text-white" />
+                        {/* Floating Content */}
+                        <div className="relative z-10 w-full max-w-lg p-12">
+                            <div className="mb-12 animate-fade-in-up">
+                                <div className="w-20 h-20 bg-white/10 backdrop-blur-2xl rounded-3xl flex items-center justify-center mb-8 border border-white/20 shadow-2xl">
+                                    <div className="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center">
+                                        <Icon name="graduation-cap" size={32} className="text-white" />
+                                    </div>
+                                </div>
+                                <h2 className="text-6xl font-black text-white font-display leading-[1.1] mb-6">
+                                    Better Way to <span className="text-indigo-400">Learn</span> & Manage.
+                                </h2>
+                                <p className="text-slate-400 text-xl font-medium leading-relaxed">
+                                    Your personal academic command center, designed for the next generation of students and educators.
+                                </p>
+                            </div>
+
+                            {/* Floating UI Previews */}
+                            <div className="relative h-64 mt-12">
+                                <div className="absolute top-0 right-0 glass-card bg-white/10 border-white/10 p-4 rounded-2xl shadow-2xl animate-float w-48 text-white">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center"><Icon name="pie-chart" size={16} /></div>
+                                        <span className="font-bold text-sm">GPA 3.92</span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                        <div className="h-full w-[92%] bg-indigo-400"></div>
+                                    </div>
+                                </div>
+                                <div className="absolute bottom-0 left-4 glass-card bg-white/10 border-white/10 p-5 rounded-3xl shadow-2xl animate-float-delayed w-64 text-white">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-teal-500 flex items-center justify-center"><Icon name="calendar" size={24} /></div>
+                                        <div>
+                                            <div className="font-bold">Next Class</div>
+                                            <div className="text-xs text-slate-400">Physics 101 • 11:00 AM</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <h1 className="text-4xl font-black text-slate-900 tracking-tight font-display mb-2">{isLogin ? t.welcome : t.appTitle}</h1>
-                            <p className="text-slate-600 font-medium">{t.subtitle}</p>
                         </div>
+                    </div>
 
-                        {/* Form Area */}
-                        <form onSubmit={handleSubmit} className="w-full glass-card p-6 rounded-[2.5rem] shadow-xl relative text-left">
+                    {/* Right Panel: Auth Form */}
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-16 relative overflow-y-auto no-scrollbar bg-slate-50/50">
+                        {/* Mobile Gradient (Hidden on Desktop) */}
+                        <div className="lg:hidden absolute top-[-10%] right-[-10%] w-[120%] h-[50%] bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob pointer-events-none"></div>
+                        <div className="lg:hidden absolute bottom-[-10%] left-[-10%] w-[120%] h-[50%] bg-gradient-to-tr from-cyan-300 via-teal-300 to-emerald-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob-reverse pointer-events-none"></div>
 
-                            {errorMsg && (
-                                <div className="mb-4 bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-2xl flex items-center gap-2 text-sm font-bold animate-fade-in-up">
-                                    <Icon name="alert-circle" size={18} />
-                                    {errorMsg}
+                        <div className="w-full max-w-md relative z-20 animate-fade-in-up">
+                            {/* Mobile Logo & Header */}
+                            <div className="mb-10 text-center lg:text-left">
+                                <div className="lg:hidden w-16 h-16 bg-white/40 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg border border-white/60">
+                                    <div className="w-11 h-11 bg-gradient-to-tr from-indigo-600 to-purple-500 rounded-xl flex items-center justify-center">
+                                        <Icon name="graduation-cap" size={24} className="text-white" />
+                                    </div>
                                 </div>
-                            )}
+                                <h1 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tight font-display mb-3">
+                                    {isLogin ? (
+                                        <React.Fragment>Welcome <span className="text-indigo-600">Back.</span></React.Fragment>
+                                    ) : (
+                                        <React.Fragment>Join <span className="text-indigo-600">EduPulse.</span></React.Fragment>
+                                    )}
+                                </h1>
+                                <p className="text-slate-500 font-bold text-lg">{isLogin ? t.subtitle : "Start your academic journey today."}</p>
+                            </div>
 
-                            {!isLogin && (
-                                <div className="mb-4 animate-fade-in-up">
-                                    <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.nameLabel}</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Icon name="user" size={18} className="text-slate-400" />
+                            {/* Form Area */}
+                            <form onSubmit={handleSubmit} className="w-full space-y-5">
+                                {errorMsg && (
+                                    <div className="bg-rose-50 border border-rose-200 text-rose-600 px-5 py-4 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-sm">
+                                        <Icon name="alert-circle" size={20} />
+                                        {errorMsg}
+                                    </div>
+                                )}
+
+                                {!isLogin && (
+                                    <div className="space-y-2">
+                                        <label className="block text-slate-600 text-[13px] font-black uppercase tracking-wider ml-1">{t.nameLabel}</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                                <Icon name="user" size={20} />
+                                            </div>
+                                            <input
+                                                type="text" value={name} onChange={e => setName(e.target.value)}
+                                                className="w-full bg-white border border-slate-200 focus:border-indigo-400 text-slate-800 rounded-2xl pl-14 pr-5 py-4 text-[15px] focus:outline-none focus:ring-8 focus:ring-indigo-500/5 transition-all font-semibold shadow-sm"
+                                                placeholder="Enter your full name"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <label className="block text-slate-600 text-[13px] font-black uppercase tracking-wider ml-1">{t.emailLabel}</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <Icon name="mail" size={20} />
                                         </div>
                                         <input
-                                            type="text"
-                                            value={name}
-                                            onChange={e => setName(e.target.value)}
-                                            className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                                            type="email" value={email} onChange={e => setEmail(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 focus:border-indigo-400 text-slate-800 rounded-2xl pl-14 pr-5 py-4 text-[15px] focus:outline-none focus:ring-8 focus:ring-indigo-500/5 transition-all font-semibold shadow-sm"
+                                            placeholder="name@university.edu"
                                         />
                                     </div>
                                 </div>
-                            )}
 
-                            <div className="mb-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                                <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.emailLabel}</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Icon name="mail" size={18} className="text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                                <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.passwordLabel}</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Icon name="lock" size={18} className="text-slate-400" />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        value={password}
-                                        onChange={e => setPassword(e.target.value)}
-                                        className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
-                                    />
-                                </div>
-                            </div>
-
-                            {!isLogin && (
-                                <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                                    <label className="block text-slate-700 text-sm font-bold mb-3 ml-2">{t.roleLabel}</label>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedRole('student')}
-                                            className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 border-2 transition-all font-bold ${selectedRole === 'student' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-transparent bg-slate-100 text-slate-500'}`}
-                                        >
-                                            <Icon name="user" size={18} /> {t.studentLabel}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedRole('teacher')}
-                                            className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 border-2 transition-all font-bold ${selectedRole === 'teacher' ? 'border-teal-500 bg-teal-50 text-teal-700' : 'border-transparent bg-slate-100 text-slate-500'}`}
-                                        >
-                                            <Icon name="briefcase" size={18} /> {t.teacherLabel}
-                                        </button>
+                                <div className="space-y-2">
+                                    <label className="block text-slate-600 text-[13px] font-black uppercase tracking-wider ml-1">{t.passwordLabel}</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                            <Icon name="lock" size={20} />
+                                        </div>
+                                        <input
+                                            type="password" value={password} onChange={e => setPassword(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 focus:border-indigo-400 text-slate-800 rounded-2xl pl-14 pr-5 py-4 text-[15px] focus:outline-none focus:ring-8 focus:ring-indigo-500/5 transition-all font-semibold shadow-sm"
+                                            placeholder="••••••••"
+                                        />
                                     </div>
                                 </div>
-                            )}
 
-                            <button
-                                type="submit"
-                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold px-8 py-4 rounded-2xl shadow-lg glowing-shadow-indigo hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 animate-fade-in-up"
-                                style={{ animationDelay: '0.4s' }}
-                            >
-                                {isLogin ? t.loginAction : t.signupAction}
-                            </button>
+                                {!isLogin && (
+                                    <div className="space-y-3 pt-2">
+                                        <label className="block text-slate-600 text-[13px] font-black uppercase tracking-wider ml-1">{t.roleLabel}</label>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button
+                                                type="button" onClick={() => setSelectedRole('student')}
+                                                className={`py-4 px-6 rounded-2xl flex items-center justify-center gap-3 border-2 transition-all font-bold text-[15px] ${selectedRole === 'student' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-md' : 'border-slate-100 bg-white text-slate-400 hover:bg-slate-50'}`}
+                                            >
+                                                <Icon name="user" size={20} /> {t.studentLabel}
+                                            </button>
+                                            <button
+                                                type="button" onClick={() => setSelectedRole('teacher')}
+                                                className={`py-4 px-6 rounded-2xl flex items-center justify-center gap-3 border-2 transition-all font-bold text-[15px] ${selectedRole === 'teacher' ? 'border-indigo-600 bg-indigo-50 text-indigo-700 shadow-md' : 'border-slate-100 bg-white text-slate-400 hover:bg-slate-50'}`}
+                                            >
+                                                <Icon name="briefcase" size={20} /> {t.teacherLabel}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
-                            <div className="mt-6 text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}
-                                    className="text-slate-600 font-semibold hover:text-indigo-600 transition-colors"
-                                >
-                                    {isLogin ? `${t.noAccount} ` : `${t.haveAccount} `}
-                                    <span className="text-indigo-600 underline underline-offset-4 font-bold">{isLogin ? t.signup : t.login}</span>
-                                </button>
-                            </div>
-                        </form>
+                                <div className="pt-4">
+                                    <button
+                                        type="submit"
+                                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-display font-black text-lg px-8 py-5 rounded-[1.25rem] shadow-xl glowing-shadow-indigo transition-all transform hover:-translate-y-1 active:scale-[0.98]"
+                                    >
+                                        {isLogin ? t.loginAction : t.signupAction}
+                                    </button>
+                                </div>
+
+                                <div className="pt-6 text-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}
+                                        className="text-slate-500 font-bold hover:text-indigo-600 transition-colors text-[15px]"
+                                    >
+                                        {isLogin ? `${t.noAccount} ` : `${t.haveAccount} `}
+                                        <span className="text-indigo-600 hover:underline underline-offset-4">{isLogin ? t.signup : t.login}</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             );
         };
-
         const HomeScreen = ({ t, role, lang, onNavigate }) => {
             const isStudent = role === 'student';
 
