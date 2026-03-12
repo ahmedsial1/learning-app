@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPulse - Premium Student Management</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f4ff',
+                            100: '#e0e8ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                        'blob-reverse': 'blob-reverse 12s infinite',
+                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%, 100%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(40px, -60px) scale(1.1)' },
+                            '66%': { transform: 'translate(-30px, 40px) scale(0.95)' },
+                        },
+                        'blob-reverse': {
+                            '0%, 100%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(-40px, 60px) scale(1.15)' },
+                            '66%': { transform: 'translate(30px, -40px) scale(0.9)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body {
+            background: #0B0F19;
+            /* Darker, richer background to make app pop */
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow:
+                0 4px 16px -4px rgba(0, 0, 0, 0.05),
+                inset 0 1px 1px rgba(255, 255, 255, 1);
+        }
+
+        .mesh-bg {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 10% 0%, hsla(253, 16%, 7%, 0.03) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.5) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, hsla(340, 100%, 76%, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(22, 100%, 77%, 0.08) 0px, transparent 50%),
+                radial-gradient(at 80% 100%, hsla(242, 100%, 70%, 0.2) 0px, transparent 50%),
+                radial-gradient(at 0% 0%, hsla(343, 100%, 76%, 0.05) 0px, transparent 50%);
+        }
+
+        .glowing-shadow-indigo {
+            box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.5);
+        }
+
+        .glowing-shadow-teal {
+            box-shadow: 0 10px 40px -10px rgba(13, 148, 136, 0.5);
+        }
+
+        .glowing-shadow-rose {
+            box-shadow: 0 10px 40px -10px rgba(225, 29, 72, 0.5);
+        }
+
+        .glowing-shadow-amber {
+            box-shadow: 0 10px 40px -10px rgba(217, 119, 6, 0.5);
+        }
+
+        .app-container {
+            box-shadow:
+                0 0 0 12px #1E293B,
+                0 0 0 14px #334155,
+                0 25px 50px -12px rgba(0, 0, 0, 0.7),
+                0 0 100px 20px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // 1. Translations Object
+        const translations = {
+            en: {
+                appTitle: "EduPulse",
+                // ... previous translations ...
+                welcome: "Welcome back",
+                subtitle: "Your academic command center.",
+                loginTeacher: "Login as Teacher",
+                loginStudent: "Login as Student",
+                studentDesc: "Access grades, schedule & assignments",
+                teacherDesc: "Manage classes, attendance & grading",
+                home: "Home",
+                messages: "Chats",
+                notes: "Notes",
+                me: "Profile",
+                attendance: "Attendance",
+                homework: "Homework",
+                grades: "Grades",
+                schedule: "Schedule",
+                goodMorning: "Good morning,",
+                studentName: "Alex Carter",
+                teacherName: "Prof. Smith",
+                todayClasses: "Today's Schedule",
+                upcoming: "Live",
+                math: "Advanced Mathematics",
+                physics: "Applied Physics",
+                room: "Room 302",
+                switchLang: "中文",
+                searchPlaceholder: "Search anything...",
+
+                // Attendance Specific
+                attendanceTitle: "Class Attendance",
+                generateCode: "Generate Code",
+                enterCode: "Enter 4-Digit Code",
+                submit: "Submit",
+                codeExpiresIn: "Code expires in",
+                seconds: "s",
+                successMsg: "Attendance marked successfully!",
+                errorWrongCode: "Invalid or expired code.",
+                errorLocation: "You are not in the classroom! (Must be within 50m)",
+                errorGps: "GPS is required for attendance.",
+                locating: "Verifying location...",
+                back: "Back",
+
+                // Auth Specific
+                signup: "Sign Up",
+                login: "Login",
+                haveAccount: "Already have an account?",
+                noAccount: "Don't have an account?",
+                nameLabel: "Full Name",
+                emailLabel: "Email Address",
+                passwordLabel: "Password",
+                roleLabel: "Select Role",
+                studentLabel: "Student",
+                teacherLabel: "Teacher",
+                errorEmpty: "Please fill all fields.",
+                errorEmailExists: "Account with this email already exists.",
+                errorInvalidCreds: "Invalid email or password.",
+                loginAction: "Login to account",
+                signupAction: "Create account"
+            },
+            zh: {
+                // ... (keeping Chinese identical to current structure, just adding translation keys)
+                appTitle: "学脉 (EduPulse)",
+                welcome: "欢迎回来",
+                subtitle: "您的专属学术控制中心",
+                loginTeacher: "教师入口",
+                loginStudent: "学生入口",
+                studentDesc: "查看成绩、课表和作业",
+                teacherDesc: "管理班级、考勤和评分",
+                home: "首页",
+                messages: "消息",
+                notes: "笔记",
+                me: "我的",
+                attendance: "考勤管理",
+                homework: "我的作业",
+                grades: "考试成绩",
+                schedule: "课程表",
+                goodMorning: "早上好，",
+                studentName: "张伟哥",
+                teacherName: "李教授",
+                todayClasses: "今日课表",
+                upcoming: "进行中",
+                math: "高等数学 (上)",
+                physics: "大学物理学",
+                room: "教1-302",
+                switchLang: "EN",
+                searchPlaceholder: "搜索课程、成绩...",
+
+                // Attendance Specific
+                attendanceTitle: "课堂考勤",
+                generateCode: "生成考勤码",
+                enterCode: "输入4位考勤码",
+                submit: "提交",
+                codeExpiresIn: "验证码过期时间",
+                seconds: "秒",
+                successMsg: "考勤打卡成功！",
+                errorWrongCode: "验证码无效或已过期。",
+                errorLocation: "您不在教室内！（必须在50米范围内）",
+                errorGps: "需要GPS权限才能进行考勤。",
+                locating: "正在验证位置...",
+                back: "返回",
+
+                // Auth Specific
+                signup: "注册",
+                login: "登录",
+                haveAccount: "已经有账号了吗？",
+                noAccount: "还没有账号？",
+                nameLabel: "姓名",
+                emailLabel: "邮箱地址",
+                passwordLabel: "密码",
+                roleLabel: "选择身份",
+                studentLabel: "学生",
+                teacherLabel: "教师",
+                errorEmpty: "请填写所有字段。",
+                errorEmailExists: "该邮箱的账户已存在。",
+                errorInvalidCreds: "邮箱或密码无效。",
+                loginAction: "登录账号",
+                signupAction: "创建账号"
+            }
+        };
+
+        // 2. Lucide Icon Wrapper
+        const Icon = React.memo(({ name, size = 24, className = "" }) => {
+            const spanRef = React.useRef(null);
+
+            React.useEffect(() => {
+                if (spanRef.current) {
+                    spanRef.current.innerHTML = `<i data-lucide="${name}"></i>`;
+                    window.lucide.createIcons({
+                        root: spanRef.current,
+                        attrs: { width: size, height: size, class: className }
+                    });
+                }
+            }, [name, size, className]);
+
+            return <span ref={spanRef} className="inline-flex items-center justify-center"></span>;
+        });
+
+        // 3. Screens
+        const AuthScreen = ({ t, onLogin }) => {
+            const [isLogin, setIsLogin] = React.useState(true);
+            const [email, setEmail] = React.useState('');
+            const [password, setPassword] = React.useState('');
+            const [name, setName] = React.useState('');
+            const [selectedRole, setSelectedRole] = React.useState('student');
+            const [errorMsg, setErrorMsg] = React.useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setErrorMsg('');
+
+                if (!email || !password || (!isLogin && !name)) {
+                    setErrorMsg(t.errorEmpty);
+                    return;
+                }
+
+                // Mock Database in LocalStorage
+                const db = JSON.parse(localStorage.getItem('eduPulse_users') || '{}');
+
+                if (isLogin) {
+                    const user = db[email];
+                    if (user && user.password === password) {
+                        // Persist session
+                        localStorage.setItem('eduPulse_session', JSON.stringify(user));
+                        onLogin(user);
+                    } else {
+                        setErrorMsg(t.errorInvalidCreds);
+                    }
+                } else {
+                    if (db[email]) {
+                        setErrorMsg(t.errorEmailExists);
+                        return;
+                    }
+                    const newUser = { email, name, role: selectedRole, password };
+                    db[email] = newUser;
+                    localStorage.setItem('eduPulse_users', JSON.stringify(db));
+                    // Persist session
+                    localStorage.setItem('eduPulse_session', JSON.stringify(newUser));
+                    onLogin(newUser);
+                }
+            };
+
+            return (
+                <div className="flex-1 flex flex-col p-8 relative z-10 w-full overflow-y-auto no-scrollbar pb-24 h-full">
+                    {/* Abstract Backgrounds */}
+                    <div className="absolute top-[-10%] right-[-10%] w-[120%] h-[50%] bg-gradient-to-br from-indigo-300 via-purple-300 to-pink-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob pointer-events-none"></div>
+                    <div className="absolute bottom-[-10%] left-[-10%] w-[120%] h-[50%] bg-gradient-to-tr from-cyan-300 via-teal-300 to-emerald-300 rounded-full mix-blend-multiply filter blur-[80px] opacity-70 animate-blob-reverse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+
+                    <div className="flex-1 flex flex-col pt-10 relative z-20 w-full animate-fade-in-up">
+                        {/* Header */}
+                        <div className="mb-10 text-center">
+                            <div className="w-20 h-20 bg-white/40 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/60">
+                                <div className="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-purple-500 rounded-[12px] flex items-center justify-center glowing-shadow-indigo">
+                                    <Icon name="graduation-cap" size={32} className="text-white" />
+                                </div>
+                            </div>
+                            <h1 className="text-4xl font-black text-slate-900 tracking-tight font-display mb-2">{isLogin ? t.welcome : t.appTitle}</h1>
+                            <p className="text-slate-600 font-medium">{t.subtitle}</p>
+                        </div>
+
+                        {/* Form Area */}
+                        <form onSubmit={handleSubmit} className="w-full glass-card p-6 rounded-[2.5rem] shadow-xl relative text-left">
+
+                            {errorMsg && (
+                                <div className="mb-4 bg-rose-50 border border-rose-200 text-rose-600 px-4 py-3 rounded-2xl flex items-center gap-2 text-sm font-bold animate-fade-in-up">
+                                    <Icon name="alert-circle" size={18} />
+                                    {errorMsg}
+                                </div>
+                            )}
+
+                            {!isLogin && (
+                                <div className="mb-4 animate-fade-in-up">
+                                    <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.nameLabel}</label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <Icon name="user" size={18} className="text-slate-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={name}
+                                            onChange={e => setName(e.target.value)}
+                                            className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="mb-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                                <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.emailLabel}</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Icon name="mail" size={18} className="text-slate-400" />
+                                    </div>
+                                    <input
+                                        type="email"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                                <label className="block text-slate-700 text-sm font-bold mb-2 ml-2">{t.passwordLabel}</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <Icon name="lock" size={18} className="text-slate-400" />
+                                    </div>
+                                    <input
+                                        type="password"
+                                        value={password}
+                                        onChange={e => setPassword(e.target.value)}
+                                        className="w-full bg-white/50 border border-white focus:border-indigo-400 text-slate-800 rounded-2xl pl-11 pr-4 py-4 text-[15px] focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+                                    />
+                                </div>
+                            </div>
+
+                            {!isLogin && (
+                                <div className="mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                                    <label className="block text-slate-700 text-sm font-bold mb-3 ml-2">{t.roleLabel}</label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelectedRole('student')}
+                                            className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 border-2 transition-all font-bold ${selectedRole === 'student' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-transparent bg-slate-100 text-slate-500'}`}
+                                        >
+                                            <Icon name="user" size={18} /> {t.studentLabel}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setSelectedRole('teacher')}
+                                            className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 border-2 transition-all font-bold ${selectedRole === 'teacher' ? 'border-teal-500 bg-teal-50 text-teal-700' : 'border-transparent bg-slate-100 text-slate-500'}`}
+                                        >
+                                            <Icon name="briefcase" size={18} /> {t.teacherLabel}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold px-8 py-4 rounded-2xl shadow-lg glowing-shadow-indigo hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 animate-fade-in-up"
+                                style={{ animationDelay: '0.4s' }}
+                            >
+                                {isLogin ? t.loginAction : t.signupAction}
+                            </button>
+
+                            <div className="mt-6 text-center animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsLogin(!isLogin); setErrorMsg(''); }}
+                                    className="text-slate-600 font-semibold hover:text-indigo-600 transition-colors"
+                                >
+                                    {isLogin ? `${t.noAccount} ` : `${t.haveAccount} `}
+                                    <span className="text-indigo-600 underline underline-offset-4 font-bold">{isLogin ? t.signup : t.login}</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const HomeScreen = ({ t, role, lang, onNavigate }) => {
+            const isStudent = role === 'student';
+
+            const gridItems = [
+                { id: 'attendance', label: t.attendance, icon: 'check-circle', color: 'from-amber-400 to-orange-500', shadow: 'glowing-shadow-amber', action: () => onNavigate('attendance') },
+                { id: 'homework', label: t.homework, icon: 'book-open', color: 'from-indigo-500 to-purple-500', shadow: 'glowing-shadow-indigo' },
+                { id: 'grades', label: t.grades, icon: 'pie-chart', color: 'from-rose-400 to-pink-500', shadow: 'glowing-shadow-rose' },
+                { id: 'schedule', label: t.schedule, icon: 'calendar', color: 'from-teal-400 to-emerald-500', shadow: 'glowing-shadow-teal' },
+            ];
+
+            return (
+                <div className="flex flex-col px-7 pt-2 pb-28 relative z-10 h-full overflow-y-auto no-scrollbar">
+                    {/* Header Details */}
+                    <div className="mb-8 flex justify-between items-center animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                        <div className="flex items-center gap-4">
+                            <div className="relative">
+                                <div className="w-16 h-16 rounded-[1.25rem] bg-gradient-to-tr from-slate-200 to-white shadow-xl overflow-hidden shrink-0 border-2 border-white p-0.5 z-10 relative">
+                                    <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${role.name || (isStudent ? 'Felix' : 'Aneka')}&backgroundColor=e2e8f0`} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full z-20"></div>
+                            </div>
+                            <div>
+                                <p className="text-[13px] text-slate-500 font-bold tracking-wide uppercase mb-1">{t.goodMorning}</p>
+                                <h2 className="text-[26px] font-black font-display text-slate-800 leading-none truncate max-w-[180px]">{role.name || (isStudent ? t.studentName : t.teacherName)}</h2>
+                            </div>
+                        </div>
+                        <div className="relative group cursor-pointer">
+                            <div className="absolute inset-0 bg-indigo-500 blur-md opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
+                            <div className="relative w-12 h-12 rounded-full glass-card flex items-center justify-center text-slate-600 hover:text-indigo-600 transition-colors">
+                                <Icon name="bell" size={22} className="animate-pulse-slow" />
+                                <span className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Search Bar - iOS Style */}
+                    <div className="relative mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                        <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <Icon name="search" size={20} className="text-slate-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder={t.searchPlaceholder}
+                            className="w-full glass-card text-slate-800 rounded-2xl pl-12 pr-4 py-4 text-[15px] focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-medium placeholder-slate-400"
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-2 flex items-center">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 cursor-pointer hover:bg-slate-200 transition-colors">
+                                <Icon name="sliders" size={18} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Premium Grid Menu */}
+                    <div className="grid grid-cols-2 gap-4 mb-10 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+                        {gridItems.map((item, idx) => (
+                            <div key={item.id} onClick={item.action} className="glass-card rounded-[2rem] p-5 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 cursor-pointer flex flex-col justify-between aspect-[1.1/1] group relative overflow-hidden">
+                                <div className="relative z-10 flex justify-between items-start w-full">
+                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${item.color} flex items-center justify-center text-white ${item.shadow} group-hover:-translate-y-1 transition-transform duration-300`}>
+                                        <Icon name={item.icon} size={28} />
+                                    </div>
+                                    <Icon name="arrow-up-right" size={20} className="text-slate-300 group-hover:text-slate-600 transition-colors" />
+                                </div>
+                                <h3 className="font-bold font-display text-slate-800 text-lg mt-4 relative z-10">{item.label}</h3>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Classes Section */}
+                    <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                        <div className="flex justify-between items-end mb-5">
+                            <h2 className="text-2xl font-black font-display text-slate-900">{t.todayClasses}</h2>
+                            <span className="text-sm font-bold text-indigo-600 bg-indigo-50/80 px-4 py-1.5 rounded-full backdrop-blur-sm cursor-pointer hover:bg-indigo-100 transition-colors flex items-center gap-1.5">
+                                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                                {t.upcoming}
+                            </span>
+                        </div>
+
+                        <div className="space-y-4">
+                            {/* Class Card 1 - Active state */}
+                            <div className="glass-card rounded-[2rem] p-5 flex items-center gap-5 cursor-pointer relative overflow-hidden group border-indigo-100/50 hover:border-indigo-200 transition-colors">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                                <div className="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500 opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity"></div>
+
+                                <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex flex-col items-center justify-center text-indigo-600 font-bold border border-indigo-100/50 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm relative z-10">
+                                    <span className="text-[10px] uppercase tracking-widest font-bold opacity-80 mb-0.5">AM</span>
+                                    <span className="text-2xl font-black font-display leading-none">09</span>
+                                </div>
+                                <div className="flex-1 relative z-10">
+                                    <h4 className="font-bold font-display text-slate-900 text-xl mb-1.5">{t.math}</h4>
+                                    <div className="flex items-center text-[13px] text-slate-500 gap-4 font-semibold">
+                                        <span className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md"><Icon name="map-pin" size={14} className="text-indigo-400" /> {t.room}</span>
+                                        <span className="flex items-center gap-1.5"><Icon name="clock" size={14} className="text-slate-400" /> 1.5h</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Class Card 2 */}
+                            <div className="glass-card rounded-[2rem] p-5 flex items-center gap-5 cursor-pointer relative overflow-hidden group hover:border-teal-200 transition-colors">
+                                <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-teal-500 opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity"></div>
+
+                                <div className="w-16 h-16 rounded-2xl bg-teal-50 flex flex-col items-center justify-center text-teal-600 font-bold border border-teal-100/50 group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300 shadow-sm relative z-10">
+                                    <span className="text-[10px] uppercase tracking-widest font-bold opacity-80 mb-0.5">AM</span>
+                                    <span className="text-2xl font-black font-display leading-none">11</span>
+                                </div>
+                                <div className="flex-1 relative z-10">
+                                    <h4 className="font-bold font-display text-slate-900 text-xl mb-1.5">{t.physics}</h4>
+                                    <div className="flex items-center text-[13px] text-slate-500 gap-4 font-semibold">
+                                        <span className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-md"><Icon name="map-pin" size={14} className="text-teal-400" /> {t.room}</span>
+                                        <span className="flex items-center gap-1.5"><Icon name="clock" size={14} className="text-slate-400" /> 2.0h</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // GPS Distance Calculation helper (Haversine formula)
+        const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+            const R = 6371e3; // Radius of the earth in m
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in m
+        };
+
+        const AttendanceScreen = ({ t, role }) => {
+            const isStudent = role.role === 'student';
+            const [code, setCode] = React.useState('');
+            const [timer, setTimer] = React.useState(0);
+            const [inputCode, setInputCode] = React.useState('');
+
+            // Interaction States
+            const [submitting, setSubmitting] = React.useState(false);
+            const [status, setStatus] = React.useState(null); // 'success', 'error'
+            const [errorMsg, setErrorMsg] = React.useState('');
+
+            // In a real app, this is fetched from a server.
+            // Using a static mock location for the "Teacher's Class"
+            const MOCK_TEACHER_LAT = 40.7128;
+            const MOCK_TEACHER_LON = -74.0060;
+
+            // Simple local storage to share the code between Teacher and Student in this single-page demo
+            React.useEffect(() => {
+                const interval = setInterval(() => {
+                    const storedCode = localStorage.getItem('eduPulse_attendance_code');
+                    const storedExpiry = localStorage.getItem('eduPulse_attendance_expiry');
+                    if (storedCode && storedExpiry) {
+                        const remaining = Math.max(0, Math.floor((parseInt(storedExpiry) - Date.now()) / 1000));
+                        if (role.role === 'teacher') {
+                            setTimer(remaining);
+                        }
+                    }
+                }, 1000);
+                return () => clearInterval(interval);
+            }, [role.role]);
+
+            const generateCode = () => {
+                const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+                setCode(newCode);
+                setTimer(60);
+                localStorage.setItem('eduPulse_attendance_code', newCode);
+                localStorage.setItem('eduPulse_attendance_expiry', Date.now() + 60000);
+                setStatus(null);
+            };
+
+            const handleStudentSubmit = () => {
+                if (!inputCode || inputCode.length !== 4) return;
+
+                setSubmitting(true);
+                setStatus(null);
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        const { latitude, longitude } = position.coords;
+
+                        // For demonstration purposes, if we are far away, we will artificially make it succeed 50% of the time
+                        // so you can actually see the success screen without physically walking to the fake coords.
+                        const distance = getDistanceFromLatLonInMeters(latitude, longitude, MOCK_TEACHER_LAT, MOCK_TEACHER_LON);
+                        const isCloseEnough = distance <= 50;
+
+                        // To test the "Error location", you can hardcode this boolean to false
+                        // const SIMULATE_PASS = Math.random() > 0.5;
+                        const allowPass = isCloseEnough; // or true if you just want to see it work
+
+                        setTimeout(() => {
+                            const activeCode = localStorage.getItem('eduPulse_attendance_code');
+                            const expiry = localStorage.getItem('eduPulse_attendance_expiry');
+                            const isExpired = Date.now() > parseInt(expiry);
+
+                            if (activeCode !== inputCode || isExpired) {
+                                setStatus('error');
+                                setErrorMsg(t.errorWrongCode);
+                            } else if (!allowPass) {
+                                setStatus('error');
+                                setErrorMsg(t.errorLocation);
+                            } else {
+                                setStatus('success');
+                            }
+                            setSubmitting(false);
+                        }, 1000);
+                    }, (error) => {
+                        console.error(error);
+                        setStatus('error');
+                        setErrorMsg(t.errorGps);
+                        setSubmitting(false);
+                    });
+                } else {
+                    setStatus('error');
+                    setErrorMsg(t.errorGps);
+                    setSubmitting(false);
+                }
+            };
+
+            return (
+                <div className="flex flex-col px-7 pt-2 pb-28 relative z-10 h-full animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                    <div className="mb-8">
+                        <h2 className="text-3xl font-black font-display text-slate-800">{t.attendanceTitle}</h2>
+                    </div>
+
+                    <div className="glass-card rounded-[2rem] p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                        {/* Background Deco */}
+                        <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber-400 opacity-10 rounded-full blur-3xl"></div>
+                        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-rose-400 opacity-10 rounded-full blur-3xl"></div>
+
+                        {role.role === 'teacher' ? (
+                            <>
+                                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 shadow-lg glowing-shadow-amber flex items-center justify-center mb-6 text-white">
+                                    <Icon name="radio" size={36} />
+                                </div>
+                                <button
+                                    onClick={generateCode}
+                                    className="bg-slate-900 text-white font-display font-bold px-8 py-4 rounded-2xl w-full shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 mb-6"
+                                >
+                                    {t.generateCode}
+                                </button>
+
+                                {timer > 0 && (
+                                    <div className="flex flex-col items-center animate-fade-in-up">
+                                        <div className="text-6xl font-black font-display tracking-widest text-slate-800 mb-2">
+                                            {code}
+                                        </div>
+                                        <div className="text-rose-500 font-bold flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full">
+                                            <Icon name="clock" size={18} />
+                                            {t.codeExpiresIn} {timer} {t.seconds}
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {status === 'success' ? (
+                                    <div className="flex flex-col items-center animate-fade-in-up py-4">
+                                        <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-emerald-400 to-teal-500 text-white flex items-center justify-center shadow-lg glowing-shadow-teal mb-6">
+                                            <Icon name="check" size={48} />
+                                        </div>
+                                        <h3 className="text-2xl font-black font-display text-slate-800 mb-2">{t.successMsg}</h3>
+                                    </div>
+                                ) : (
+                                    <div className="w-full flex flex-col items-center">
+                                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg glowing-shadow-indigo flex items-center justify-center mb-6 text-white">
+                                            <Icon name="map-pin" size={36} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            maxLength="4"
+                                            placeholder="0000"
+                                            value={inputCode}
+                                            onChange={(e) => setInputCode(e.target.value.replace(/[^0-9]/g, ''))}
+                                            className="w-full text-center text-4xl font-black font-display tracking-widest bg-slate-100 rounded-2xl py-4 mb-4 focus:outline-none focus:ring-4 focus:ring-indigo-500/20"
+                                        />
+                                        <button
+                                            disabled={inputCode.length !== 4 || submitting}
+                                            onClick={handleStudentSubmit}
+                                            className={`w-full font-display font-bold px-8 py-4 rounded-2xl shadow-lg transition-all mb-4 ${inputCode.length === 4 ? 'bg-indigo-600 text-white hover:shadow-xl hover:-translate-y-1 active:scale-95' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                                        >
+                                            {submitting ? (
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <Icon name="loader" size={20} className="animate-spin" />
+                                                    {t.locating}
+                                                </span>
+                                            ) : t.submit}
+                                        </button>
+
+                                        {status === 'error' && (
+                                            <div className="w-full bg-rose-50 text-rose-600 font-bold p-4 rounded-xl flex items-center gap-3 animate-fade-in-up text-left">
+                                                <Icon name="alert-circle" size={24} className="shrink-0" />
+                                                <span className="text-sm">{errorMsg}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const BottomNav = ({ t }) => {
+            const navItems = [
+                { id: 'home', label: t.home, icon: 'home', active: true },
+                { id: 'messages', label: t.messages, icon: 'message-square', active: false },
+                { id: 'notes', label: t.notes, icon: 'file-text', active: false },
+                { id: 'me', label: t.me, icon: 'user', active: false },
+            ];
+
+            return (
+                <div className="absolute bottom-0 left-0 right-0 h-[100px] glass-panel rounded-t-[2.5rem] flex justify-around items-center px-6 pb-6 pt-4 z-40 border-b-0 border-r-0 border-l-0">
+                    {navItems.map(item => (
+                        <div key={item.id} className="flex flex-col items-center justify-center gap-1 cursor-pointer w-16 group">
+                            <div className={`relative flex items-center justify-center w-14 h-12 rounded-[18px] transition-all duration-300 ${item.active ? 'text-white shadow-lg glowing-shadow-indigo pointer-events-none' : 'text-slate-400 group-hover:text-slate-700 group-hover:bg-slate-100/50'}`}>
+                                {item.active && <div className="absolute inset-0 bg-gradient-to-tr from-indigo-600 to-indigo-500 rounded-[18px]"></div>}
+                                <div className="relative z-10 flex flex-col items-center gap-1">
+                                    <Icon
+                                        name={item.icon}
+                                        size={item.active ? 22 : 24}
+                                        className={item.active ? '' : 'transition-transform group-hover:scale-110 group-active:scale-95'}
+                                    />
+                                </div>
+                            </div>
+                            <span className={`text-[11px] font-bold tracking-wide transition-all duration-300 ${item.active ? 'text-indigo-600 opacity-100' : 'text-slate-400 opacity-0 group-hover:opacity-100'}`}>
+                                {item.label}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // 4. Main App Component
+        const App = () => {
+            const [lang, setLang] = React.useState('en');
+            const [userRole, setUserRole] = React.useState(null); // Will store {email, name, role}
+            const [currentView, setCurrentView] = React.useState('home');
+
+            // Check for persistent session
+            React.useEffect(() => {
+                const session = localStorage.getItem('eduPulse_session');
+                if (session) {
+                    try {
+                        const user = JSON.parse(session);
+                        setUserRole(user);
+                    } catch (e) { }
+                }
+            }, []);
+
+            const t = translations[lang];
+
+            const toggleLang = () => {
+                setLang(l => l === 'en' ? 'zh' : 'en');
+            };
+
+            const handleLogout = () => {
+                localStorage.removeItem('eduPulse_session');
+                setUserRole(null);
+                setCurrentView('home');
+            };
+
+            const handleBack = () => {
+                setCurrentView('home');
+            };
+
+            return (
+                <div className="min-h-screen w-full flex items-center justify-center p-4 lg:p-8 font-sans">
+                    {/* Floating Orbs behind the phone */}
+                    <div className="fixed top-20 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+                    <div className="fixed bottom-20 right-1/4 w-96 h-96 bg-rose-600/20 rounded-full blur-[100px] pointer-events-none"></div>
+
+                    {/* Device Container Wrapper with iPhone Frame styling */}
+                    <div className="w-full max-w-[428px] h-[926px] max-h-[90vh] app-container bg-black rounded-[55px] p-2 relative z-10">
+                        {/* Actual Screen Content */}
+                        <div className="w-full h-full mesh-bg rounded-[45px] overflow-hidden flex flex-col relative z-20">
+
+                            {/* Dynamic Island Mock */}
+                            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full z-50 flex items-center justify-between px-3">
+                                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                                <div className="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
+                            </div>
+
+                            {/* iOS Status Bar */}
+                            <div className="h-12 w-full flex justify-between items-center px-8 pt-2 select-none bg-transparent absolute top-0 z-40">
+                                <span className="text-[14px] font-bold text-slate-900 tracking-tight">9:41</span>
+                                <div className="flex gap-1.5 items-center">
+                                    <Icon name="bar-chart-2" size={14} className="text-slate-900 rotate-90" />
+                                    <Icon name="wifi" size={14} className="text-slate-900" />
+                                    <Icon name="battery-full" size={18} className="text-slate-900" />
+                                </div>
+                            </div>
+
+                            {/* Top App Bar */}
+                            <div className="px-6 pt-16 pb-2 flex justify-between items-center z-30 relative animate-fade-in-up">
+                                {userRole ? (
+                                    <button
+                                        onClick={currentView === 'home' ? handleLogout : handleBack}
+                                        className="h-11 w-11 glass-card rounded-full flex items-center justify-center text-slate-600 hover:text-indigo-600 hover:scale-105 active:scale-95 transition-all shadow-sm"
+                                    >
+                                        <Icon name="arrow-left" size={20} />
+                                    </button>
+                                ) : (
+                                    <div className="w-11"></div>
+                                )}
+
+                                <button
+                                    onClick={toggleLang}
+                                    className="glass-card text-indigo-700 px-5 py-2.5 rounded-full text-sm font-bold shadow-sm shadow-indigo-100 flex items-center gap-2 hover:bg-white hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <Icon name="globe" size={16} className="text-indigo-500" />
+                                    <span className="font-display tracking-wide">{t.switchLang}</span>
+                                </button>
+                            </div>
+
+                            {/* Content Routing */}
+                            {!userRole ? (
+                                <AuthScreen t={t} onLogin={(user) => { setUserRole(user); setCurrentView('home'); }} />
+                            ) : (
+                                currentView === 'attendance' ? (
+                                    <AttendanceScreen t={t} role={userRole} />
+                                ) : (
+                                    <HomeScreen t={t} role={userRole.role} lang={lang} onNavigate={setCurrentView} />
+                                )
+                            )}
+
+                            {/* Navigation */}
+                            {userRole && <BottomNav t={t} />}
+
+                            {/* iOS Home Indicator */}
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-900/50 rounded-full z-50"></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
